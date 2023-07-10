@@ -11,7 +11,7 @@ import config
 app = Flask(__name__)
 app.config.from_object(config)
 
-ocr = ddddocr.DdddOcr(old=True)
+ocr = ddddocr.DdddOcr(old=True, show_ad=False)
 
 
 # 图片  转    base64

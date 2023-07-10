@@ -1,12 +1,12 @@
-from flask import Flask, render_template, json, request
-from gevent import pywsgi
-import config
-import ddddocr
-
 import json as chenhao
-
 from base64 import b64decode
 from base64 import b64encode
+
+import ddddocr
+from flask import Flask, render_template, json, request
+from gevent import pywsgi
+
+import config
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -40,13 +40,13 @@ def sysconfig_save_jsonstr():
         data = request.get_data()
         data = json.loads(data)
 
-        # 校验token
-        request_token = data['token']
-        if not request_token:
-            return chenhao.dumps({
-                "status": 200,
-                "message": "token 没有"
-            }), 200, {"Content-Type": "application/json"}
+        # # 校验token
+        # request_token = data['token']
+        # if not request_token:
+        #     return chenhao.dumps({
+        #         "status": 200,
+        #         "message": "token 没有"
+        #     }), 200, {"Content-Type": "application/json"}
 
         var = data['img']
 
@@ -57,6 +57,8 @@ def sysconfig_save_jsonstr():
 
         # print(b64decode(image))
         res = ocr.classification(image)
+
+        print(res)
 
         result = {
             "status": 200,
@@ -71,6 +73,43 @@ def sysconfig_save_jsonstr():
         return e
 
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    result = {
+        "status": 200,
+        "message": "pong"
+    }
+    return chenhao.dumps(result), 200, {"Content-Type": "application/json"}
+
+
+@app.route('/upload', methods=['POST'])
+def upload():
+
+    file = request.files['img']
+    file.save('test.jpg')
+
+    with open("test.jpg", 'rb') as f:
+        image = f.read()
+
+        # print(b64decode(image))
+    res = ocr.classification(image)
+
+    print(res)
+
+    result = {
+        "status": 200,
+        "message": res
+    }
+    return render_template('show.html', str=res)
+
+
+# ========== page ==========
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
 if __name__ == '__main__':
-    server = pywsgi.WSGIServer(('0.0.0.0',8787),app)
+    server = pywsgi.WSGIServer(('0.0.0.0', 8787), app)
+    print("server start")
     server.serve_forever()

@@ -34,6 +34,7 @@ def base2picture(var):
     file.close()
 
 
+# base64通过json上传
 @app.route('/imgBase64JSON', methods=['POST'])
 def sysconfig_save_jsonstr():
     try:
@@ -73,6 +74,7 @@ def sysconfig_save_jsonstr():
         return e
 
 
+# ping接口
 @app.route('/ping', methods=['GET'])
 def ping():
     result = {
@@ -82,6 +84,7 @@ def ping():
     return chenhao.dumps(result), 200, {"Content-Type": "application/json"}
 
 
+# form表单上传文件
 @app.route('/upload', methods=['POST'])
 def upload():
 
@@ -91,15 +94,8 @@ def upload():
     with open("test.jpg", 'rb') as f:
         image = f.read()
 
-        # print(b64decode(image))
     res = ocr.classification(image)
-
     print(res)
-
-    result = {
-        "status": 200,
-        "message": res
-    }
     return render_template('show.html', str=res)
 
 
